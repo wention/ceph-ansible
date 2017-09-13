@@ -2,6 +2,10 @@
 # use shell rather than docker module
 # to ensure osd disk prepare finishes before
 # starting the next task
+- name: stop
+  fail:
+    msg: "stop"
+
 - name: prepare ceph containerized osd disk collocated
   shell: |
     docker run --net=host \
