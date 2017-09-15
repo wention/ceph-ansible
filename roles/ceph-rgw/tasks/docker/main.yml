@@ -7,3 +7,8 @@
 
 - name: include copy_rgw_configs.yml
   include: copy_rgw_configs.yml
+
+- name: include debug_docker_rgw.yml
+  include: debug_docker_rgw.yml
+  when:
+    - rgw_container_health.rc != 0

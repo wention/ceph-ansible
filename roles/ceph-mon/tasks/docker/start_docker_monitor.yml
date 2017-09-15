@@ -49,19 +49,22 @@
     group: "root"
     mode: "0644"
 
-- name: enable systemd unit file for mon instance
-  shell: systemctl enable ceph-mon@{{ ansible_hostname }}.service
-  failed_when: false
-  changed_when: false
-
-- name: reload systemd unit files
-  shell: systemctl daemon-reload
-  changed_when: false
-  failed_when: false
-
 - name: systemd start mon container
-  service:
+  systemd:
     name: ceph-mon@{{ ansible_hostname }}
     state: started
     enabled: yes
+    daemon_reload: yes
+
+- name: get ceph mon container id
+  command: "docker ps -a -q --filter='name=ceph-mon-{{ ansible_hostname }}'"
+  register: ceph_mon_container_id
+
+- name: make sure ceph mon container stays alive
+  shell: |
+    first_id="{{ ceph_mon_container_id }}"
+    id=$(docker ps -a -q --filter='name=ceph-mon-{{ ansible_hostname }}')
+    ! timeout 30 bash -c "while [[ $first_id == $id ]]; do continue ; done" ]]
   changed_when: false
+  failed_when: false
+  register: mon_container_health

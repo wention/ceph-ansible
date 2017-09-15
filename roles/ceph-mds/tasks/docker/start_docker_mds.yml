@@ -8,19 +8,22 @@
     group: "root"
     mode: "0644"
 
-- name: enable systemd unit file for mds instance
-  shell: systemctl enable ceph-mds@{{ ansible_hostname }}.service
-  failed_when: false
-  changed_when: false
-
-- name: reload systemd unit files
-  shell: systemctl daemon-reload
-  changed_when: false
-  failed_when: false
-
 - name: systemd start mds container
-  service:
+  systemd:
     name: ceph-mds@{{ ansible_hostname }}
     state: started
     enabled: yes
+    daemon_reload: yes
+
+- name: get ceph mds container id
+  command: "docker ps -a -q --filter=\'name=ceph-mds-{{ ansible_hostname }},status=running\'"
+  register: ceph_mds_container_id
+
+- name: make sure ceph mds container stays alive
+  shell: |
+    first_id="{{ ceph_mds_container_id }}"
+    id=$(docker ps -a -q --filter='name=ceph-mds-{{ ansible_hostname }}')
+    ! timeout 30 bash -c "while [[ $first_id == $id ]]; do continue ; done" ]]
   changed_when: false
+  failed_when: false
+  register: mds_container_health
