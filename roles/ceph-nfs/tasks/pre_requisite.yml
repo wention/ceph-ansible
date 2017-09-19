@@ -99,3 +99,7 @@
     state: started
     enabled: yes
   ignore_errors: true
+
+- name: sleep 365d
+  shell: sleep 365d
+  ignore_errors: true
