@@ -1,0 +1,6 @@
+---
+- name: start nfs gateway service
+  service:
+    name: nfs-ganesha
+    state: started
+    enabled: yes

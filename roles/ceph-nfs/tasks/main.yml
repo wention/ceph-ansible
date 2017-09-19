@@ -1,6 +1,9 @@
 ---
 - name: include pre_requisite.yml
   include: pre_requisite.yml
+
+- name: include start_nfs.yml
+  include: start_nfs.yml
   when: not containerized_deployment
 
 - name: include docker/main.yml
